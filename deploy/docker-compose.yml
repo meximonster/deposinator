@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+    postgres:
+        container_name: deposinator_postgres
+        image: postgres:14.2
+        restart: always
+        environment:
+          - POSTGRES_USER=${POSTGRES_USER}
+          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+          - PGPORT=9944
+        ports:
+          - '9944:9944'
+        volumes: 
+          - ./postgres-data:/var/lib/postgresql/data
+          - ./tables.sql:/docker-entrypoint-initdb.d/tables.sql
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+        networks:
+          deposinator_subnet:
+            ipv4_address: 172.20.10.10
+
+    deposinator:
+      container_name: deposinator_app
+      build: ../
+      security_opt:
+        - seccomp:unconfined
+      environment:
+        - PORT=5000
+      ports:
+        - "5000:5000"
+      volumes:
+        - ../.env:/app/.env
+      depends_on:
+        postgres:
+          condition: service_healthy
+      networks:
+        deposinator_subnet:
+          ipv4_address: 172.20.10.11
+
+volumes:
+  postgres-data:
+
+networks:
+  deposinator_subnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.10.0/24
