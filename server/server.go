@@ -1,51 +1,29 @@
 package server
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"net/http"
-	"strings"
+	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/deposinator/controller"
+	"github.com/gorilla/mux"
 )
 
-var tokens []string
+func Run() error {
 
-func Run(accounts map[string]string) error {
-	r := gin.Default()
-	r.POST("/login", gin.BasicAuth(accounts), func(c *gin.Context) {
-		token, _ := randomHex(20)
-		tokens = append(tokens, token)
+	r := mux.NewRouter()
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         ":5000",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
 
-		c.JSON(http.StatusOK, gin.H{
-			"token": token,
-		})
-	})
-	r.GET("/resource", func(c *gin.Context) {
-		bearerToken := c.Request.Header.Get("Authorization")
-		reqToken := strings.Split(bearerToken, " ")[1]
-		for _, token := range tokens {
-			if token == reqToken {
-				c.JSON(http.StatusOK, gin.H{
-					"data": "resource data",
-				})
-				return
-			}
-		}
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "unauthorized",
-		})
-	})
-	if err := r.Run(); err != nil {
+	r.HandleFunc("/signup", controller.Signup).Methods("POST")
+	r.HandleFunc("/login", controller.Login).Methods("POST")
+	r.HandleFunc("/logout", controller.Logout).Methods("POST")
+
+	if err := srv.ListenAndServe(); err != nil {
 		return err
 	}
 	return nil
-}
-
-func randomHex(n int) (string, error) {
-	bytes := make([]byte, n)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(bytes), nil
 }
