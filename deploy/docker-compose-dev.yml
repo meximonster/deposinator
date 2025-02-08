@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+    postgres:
+        container_name: deposinator_postgres_dev
+        image: postgres:14.2
+        restart: always
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+          - PGPORT=5432
+        ports:
+          - '5432:5432'
+        volumes: 
+          - ./postgres-data-dev:/var/lib/postgresql/data
+          - ./tables.sql:/docker-entrypoint-initdb.d/tables.sql
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+
+volumes:
+  postgres-data:

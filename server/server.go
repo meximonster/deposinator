@@ -1,28 +1,19 @@
 package server
 
 import (
-	"net/http"
-	"time"
-
-	"github.com/deposinator/controller"
-	"github.com/gorilla/mux"
+	"github.com/deposinator/controllers"
+	"github.com/gin-gonic/gin"
 )
 
 func Run() error {
 
-	r := mux.NewRouter()
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         ":5000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
+	r := gin.Default()
+	r.Use(gin.Logger())
+	r.POST("/users/signup", controllers.Signup)
+	r.POST("/users/login", controllers.Login)
+	r.DELETE("/users/logout", controllers.Logout)
 
-	r.HandleFunc("/signup", controller.Signup).Methods("POST")
-	r.HandleFunc("/login", controller.Login).Methods("POST")
-	r.HandleFunc("/logout", controller.Logout).Methods("POST")
-
-	if err := srv.ListenAndServe(); err != nil {
+	if err := r.Run(":5000"); err != nil {
 		return err
 	}
 	return nil
