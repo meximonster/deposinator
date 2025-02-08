@@ -26,7 +26,6 @@ Bearer token loaded from env at startup
 > {  
 > "initiator",: "string",  
 > "members": []string,  
-> "casino": "string",  
 > "amount": int,  
 > "description": "string"  
 > }
@@ -44,7 +43,6 @@ Bearer token loaded from env at startup
 Deposit:
 
 - members is a dropdown selection of usernames in accounts db
-- casino also needs to be a dropdown selection (TBD if loaded from db or kept in frontend)
 
 Withdraw:
 

@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	AUTH_TOKEN    string `yaml:"AUTH_TOKEN"`
+	HTTP_PORT     string `yaml:"HTTP_PORT"`
 	POSTGRES_HOST string `yaml:"POSTGRES_HOST"`
 	POSTGRES_USER string `yaml:"POSTGRES_USER"`
 	POSTGRES_PASS string `yaml:"POSTGRES_PASS"`
+	STORE_KEY     string `yaml:"STORE_KEY"`
 }
 
 func Load() (*Config, error) {

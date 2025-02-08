@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/deposinator/models"
@@ -20,19 +22,22 @@ func Signup(c *gin.Context) {
 	var data formData
 	c.Bind(&data)
 
-	exists, err := models.UserExists(data.Email)
+	exists, err := models.UserExists(data.Username, data.Email)
 	if err != nil {
+		log.Println("error checking user status: ", err)
 		c.Render(http.StatusInternalServerError, render.Data{})
 		return
 	}
 
 	if exists {
+		log.Println("user exists: ", data.Username)
 		c.Render(http.StatusBadRequest, render.Data{})
 		return
 	}
 
 	userID, err := models.UserCreate(data.Username, data.Email, data.Password)
 	if err != nil {
+		log.Println(fmt.Sprintf("error creating user %s: %s", data.Username, err.Error()))
 		c.Render(http.StatusInternalServerError, render.Data{})
 		return
 	}
@@ -40,7 +45,6 @@ func Signup(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("userID", userID)
 	session.Save()
-	c.Status(http.StatusAccepted)
 
 }
 
@@ -58,7 +62,7 @@ func Login(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("userID", user.Id)
 	session.Save()
-	c.Status(http.StatusAccepted)
+	c.Status(http.StatusOK)
 
 }
 
@@ -68,6 +72,6 @@ func Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	c.Status(http.StatusAccepted)
+	c.Status(http.StatusOK)
 
 }

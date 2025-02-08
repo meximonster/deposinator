@@ -2,20 +2,22 @@ package models
 
 import (
 	"database/sql"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Id       int64  `json:"id,omitempty"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Id         int       `json:"id,omitempty"`
+	Username   string    `json:"username"`
+	Email      string    `json:"email"`
+	Password   string    `json:"password"`
+	Created_at time.Time `json:"created_at,omitempty"`
 }
 
-func UserExists(email string) (bool, error) {
+func UserExists(username string, email string) (bool, error) {
 	var user User
-	err := db.Get(&user, "SELECT * FROM users WHERE email = $1", email)
+	err := db.Get(&user, "SELECT * FROM users WHERE username = $1 OR email = $2", username, email)
 	// user does not exist
 	if err == sql.ErrNoRows {
 		return false, nil
