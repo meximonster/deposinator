@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/deposinator/models"
+	"github.com/deposinator/db"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		userId := sessionID.(int)
 		// Check if the user exists
-		user := models.UserFromId(userId)
+		user := db.UserFromId(userId)
 		if user.Id == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}

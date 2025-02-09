@@ -4,24 +4,23 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/deposinator/models"
+	"github.com/deposinator/db"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
 )
 
-type formData struct {
-	Username string `form:"username"`
-	Email    string `form:"email"`
-	Password string `form:"password"`
+type userData struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func Signup(c *gin.Context) {
-
-	var data formData
+	var data userData
 	c.Bind(&data)
 
-	exists, err := models.UserExists(data.Username, data.Email)
+	exists, err := db.UserExists(data.Username, data.Email)
 	if err != nil {
 		log.Println("error checking user status: ", err)
 		c.Render(http.StatusInternalServerError, render.Data{})
@@ -34,7 +33,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	userID, err := models.UserCreate(data.Username, data.Email, data.Password)
+	userID, err := db.UserCreate(data.Username, data.Email, data.Password)
 	if err != nil {
 		log.Printf("error creating user %s: %s", data.Username, err.Error())
 		c.Render(http.StatusInternalServerError, render.Data{})
@@ -44,15 +43,14 @@ func Signup(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("userID", userID)
 	session.Save()
-
+	c.Status(http.StatusOK)
 }
 
 func Login(c *gin.Context) {
-
-	var data formData
+	var data userData
 	c.Bind(&data)
 
-	user := models.MatchUserPassword(data.Email, data.Password)
+	user := db.MatchUserPassword(data.Email, data.Password)
 	if user.Id == 0 {
 		c.Render(http.StatusUnauthorized, render.Data{})
 		return
@@ -62,15 +60,12 @@ func Login(c *gin.Context) {
 	session.Set("userID", user.Id)
 	session.Save()
 	c.Status(http.StatusOK)
-
 }
 
 func Logout(c *gin.Context) {
-
 	// Delete the session
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
 	c.Status(http.StatusOK)
-
 }

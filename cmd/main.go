@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/deposinator/config"
-	"github.com/deposinator/models"
+	"github.com/deposinator/db"
 	"github.com/deposinator/server"
 	_ "github.com/lib/pq"
 )
@@ -15,7 +15,7 @@ func main() {
 		log.Fatal("error loading configuration: ", err.Error())
 	}
 
-	err = models.NewDB(c.POSTGRES_HOST, c.POSTGRES_USER, c.POSTGRES_PASS)
+	err = db.NewDB(c.POSTGRES_HOST, c.POSTGRES_USER, c.POSTGRES_PASS)
 	if err != nil {
 		log.Fatal("error connecting to db: ", err)
 	}
