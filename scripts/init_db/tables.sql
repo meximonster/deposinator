@@ -10,7 +10,7 @@ CREATE TABLE users
 CREATE TABLE deposits
 (
     id            serial        PRIMARY KEY,
-    issuer        VARCHAR(50)       REFERENCES users(username) ON DELETE CASCADE,
+    issuer        VARCHAR(50)   REFERENCES users(username) ON DELETE CASCADE,
     amount        INTEGER       NOT NULL,
     description   VARCHAR(100)  NOT NULL,
     created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
@@ -26,8 +26,8 @@ CREATE TABLE deposit_members
 CREATE TABLE withdraws
 (
     id            serial        PRIMARY KEY,
-    issuer        INTEGER       REFERENCES users(id) ON DELETE CASCADE,
-    deposit_id       INTEGER       REFERENCES deposits(id) ON DELETE CASCADE,
+    issuer        VARCHAR(50)   REFERENCES users(username) ON DELETE CASCADE,
+    deposit_id    INTEGER       REFERENCES deposits(id) ON DELETE CASCADE,
     amount        INTEGER       NOT NULL,
     description   VARCHAR(100)  NOT NULL,
     created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
