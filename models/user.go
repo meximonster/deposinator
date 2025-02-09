@@ -8,11 +8,11 @@ import (
 )
 
 type User struct {
-	Id         int       `json:"id,omitempty"`
-	Username   string    `json:"username"`
-	Email      string    `json:"email"`
-	Password   string    `json:"password"`
-	Created_at time.Time `json:"created_at,omitempty"`
+	Id         int
+	Username   string
+	Email      string
+	Password   string
+	Created_at time.Time
 }
 
 func UserExists(username string, email string) (bool, error) {

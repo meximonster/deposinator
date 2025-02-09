@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -37,7 +36,7 @@ func Signup(c *gin.Context) {
 
 	userID, err := models.UserCreate(data.Username, data.Email, data.Password)
 	if err != nil {
-		log.Println(fmt.Sprintf("error creating user %s: %s", data.Username, err.Error()))
+		log.Printf("error creating user %s: %s", data.Username, err.Error())
 		c.Render(http.StatusInternalServerError, render.Data{})
 		return
 	}
