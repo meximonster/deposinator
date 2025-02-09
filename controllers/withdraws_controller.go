@@ -8,7 +8,6 @@ import (
 
 	"github.com/deposinator/db"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/render"
 )
 
 type withdrawData struct {
@@ -22,12 +21,15 @@ type withdrawData struct {
 
 func WithdrawCreate(c *gin.Context) {
 	var data withdrawData
-	c.Bind(&data)
+	if err := c.BindJSON(&data); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 
 	err := db.WithdrawCreate(data.Issuer, data.Deposit_id, data.Amount, data.Description)
 	if err != nil {
 		log.Println("error creating withdraw: ", err)
-		c.Render(http.StatusInternalServerError, render.Data{})
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 	c.Status(http.StatusOK)
@@ -35,11 +37,15 @@ func WithdrawCreate(c *gin.Context) {
 
 func WithdrawUpdate(c *gin.Context) {
 	var data withdrawData
-	c.Bind(&data)
+	if err := c.BindJSON(&data); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
 	err := db.WithdrawUpdate(data.Id, data.Issuer, data.Deposit_id, data.Amount, data.Description)
 	if err != nil {
 		log.Println("error updating withdraw: ", err)
-		c.Render(http.StatusInternalServerError, render.Data{})
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 	c.Status(http.StatusOK)
@@ -49,19 +55,19 @@ func WithdrawDelete(c *gin.Context) {
 	id := c.Query("id")
 	if id == "" {
 		log.Println("id parameter not found")
-		c.Render(http.StatusBadRequest, render.Data{})
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 	deposit_id, err := strconv.Atoi(id)
 	if err != nil {
 		log.Println("invalid deposit id: ", id)
-		c.Render(http.StatusBadRequest, render.Data{})
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 	err = db.WithdrawDelete(deposit_id)
 	if err != nil {
 		log.Println("error deleting withdraw: ", err)
-		c.Render(http.StatusInternalServerError, render.Data{})
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 	c.Status(http.StatusOK)
