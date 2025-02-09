@@ -27,7 +27,7 @@ CREATE TABLE withdraws
 (
     id            serial        PRIMARY KEY,
     issuer        INTEGER       REFERENCES users(id) ON DELETE CASCADE,
-    deposit       INTEGER       REFERENCES deposits(id) ON DELETE CASCADE,
+    deposit_id       INTEGER       REFERENCES deposits(id) ON DELETE CASCADE,
     amount        INTEGER       NOT NULL,
     description   VARCHAR(100)  NOT NULL,
     created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
