@@ -1,11 +1,15 @@
 # DEPOSINATOR
 
-- Create a .env file using .env.example file in project root and deploy folder
+Create a .env file using .env.example in project root
 
 ## Run locally
 
-> make dev
+```
+make dev
+```
 
 ## Populate the db
 
-> make data
+```
+make data
+```
