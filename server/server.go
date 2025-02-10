@@ -46,14 +46,14 @@ func Run(env string, port string, storeKey string) {
 	{
 		deposits.POST("/", middlewares.AuthMiddleware(), controllers.DepositCreate)
 		deposits.PUT("/", middlewares.AuthMiddleware(), controllers.DepositUpdate)
-		deposits.DELETE("/", middlewares.AuthMiddleware(), controllers.DepositDelete)
+		deposits.DELETE("/:id", middlewares.AuthMiddleware(), controllers.DepositDelete)
 	}
 
 	withdraws := r.Group("/withdraw")
 	{
 		withdraws.POST("/", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
 		withdraws.PUT("/", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
-		withdraws.DELETE("/", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
+		withdraws.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
 	}
 
 	r.Run(":" + port)

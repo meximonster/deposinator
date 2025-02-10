@@ -4,7 +4,7 @@ import (
 	"github.com/deposinator/models"
 )
 
-func DepositCreate(issuer string, members []int, amount int, description string) error {
+func DepositCreate(issuer int, members []int, amount int, description string) error {
 	q := "INSERT INTO deposits (issuer, amount, description) VALUES ($1, $2, $3) RETURNING id"
 	var id int
 	err := db.QueryRow(q, issuer, amount, description).Scan(&id)
@@ -14,7 +14,7 @@ func DepositCreate(issuer string, members []int, amount int, description string)
 	return insertDepositMembers(id, members)
 }
 
-func DepositUpdate(id int, issuer string, members []int, amount int, description string) error {
+func DepositUpdate(id int, issuer int, members []int, amount int, description string) error {
 	q := "UPDATE deposits SET issuer = $1, amount = $2, description = $3 where id = $4"
 	_, err := db.Exec(q, issuer, amount, description, id)
 	if err != nil {

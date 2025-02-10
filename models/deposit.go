@@ -7,7 +7,7 @@ import (
 
 type Deposit struct {
 	Id          int       `json:"id,omitempty"`
-	Issuer      string    `json:"issuer"`
+	Issuer      int       `json:"issuer"`
 	Members     []int     `json:"members"`
 	Amount      int       `json:"amount"`
 	Description string    `json:"description"`

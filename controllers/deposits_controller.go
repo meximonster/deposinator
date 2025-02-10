@@ -44,7 +44,7 @@ func DepositUpdate(c *gin.Context) {
 }
 
 func DepositDelete(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 	if id == "" {
 		log.Println("id parameter not found")
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "missing id parameter"))
