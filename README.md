@@ -1,50 +1,15 @@
 # DEPOSINATOR
 
-## Webapp/Server Authorization
+- Create a .env file using .env.example file in project root and deploy folder
 
-Bearer token loaded from env at startup
+## Run locally
 
-## Endpoints
+> make dev
 
-- POST /signup
+## Populate the db
 
-> {  
-> "username": "string",  
-> "email": "string",  
-> "password": "string"  
-> }
+> make users
 
-- POST /login
+## Clean the db
 
-> {  
-> "username": "string",  
-> "password": "string"  
-> }
-
-- POST /deposit
-
-> {  
-> "initiator",: "string",  
-> "members": []string,  
-> "amount": int,  
-> "description": "string"  
-> }
-
-- POST /withdraw
-
-> {  
-> "deposit": int,  
-> "amount": int,  
-> "description": "string"  
-> }
-
-### Implementation ideas
-
-Deposit:
-
-- members is a dropdown selection of usernames in accounts db
-
-Withdraw:
-
-- deposit correlates to a deposit id
-- deposit is a dropdown with deposit info (date, amount) to help correlate the withdraw
+> make clean
