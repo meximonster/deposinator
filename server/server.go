@@ -20,18 +20,18 @@ func Run(env string, port string, storeKey string) {
 	store.Options(sessions.Options{
 		Path:     "/",
 		MaxAge:   21600,
-		Secure:   false, // Set to true in production with HTTPS
+		Secure:   false,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
 	r.Use(sessions.Sessions("deposinator", store))
 	if env == "dev" {
 		r.Use(cors.New(cors.Config{
-			AllowOrigins:     []string{"http://localhost:3000"}, // Frontend URL
+			AllowOrigins:     []string{"http://localhost:3000"},
 			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-			AllowCredentials: true,           // Allow cookies and credentials
-			MaxAge:           12 * time.Hour, // Cache preflight requests
+			AllowCredentials: true,
+			MaxAge:           12 * time.Hour,
 		}))
 	}
 
@@ -55,6 +55,9 @@ func Run(env string, port string, storeKey string) {
 		withdraws.PUT("/", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
 		withdraws.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
 	}
+
+	r.Static("/swagger-ui", "./swagger-ui")
+	r.StaticFile("/docs/swagger.yml", "./docs/swagger.yml")
 
 	r.Run(":" + port)
 }

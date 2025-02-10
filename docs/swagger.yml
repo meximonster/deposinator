@@ -1,0 +1,214 @@
+swagger: '2.0'
+info:
+  title: Go API
+  description: API for managing users, deposits, and withdrawals
+  version: 1.0.0
+basePath: /api
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /users/signup:
+    post:
+      summary: Sign up a new user
+      description: Creates a new user account
+      parameters:
+        - in: body
+          name: user
+          description: The user to create
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        '200':
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+  /users/login:
+    post:
+      summary: Log in a user
+      description: Authenticates a user and returns a token
+      parameters:
+        - in: body
+          name: credentials
+          description: The user's credentials
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        '200':
+          description: User logged in successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+  /users/logout:
+    delete:
+      summary: Log out a user
+      description: Invalidates the user's authentication token
+      responses:
+        '200':
+          description: User logged out successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+  /deposit:
+    post:
+      summary: Create a new deposit
+      description: Creates a new deposit transaction
+      parameters:
+        - in: body
+          name: deposit
+          description: The deposit to create
+          required: true
+          schema:
+            type: object
+            properties:
+              issuer:
+                type: integer
+              members:
+                type: array
+                items:
+                  type: integer
+              amount:
+                type: number
+              description:
+                type: string
+      responses:
+        '200':
+          description: Deposit created successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+    put:
+      summary: Update a deposit
+      description: Updates an existing deposit transaction
+      parameters:
+        - in: body
+          name: deposit
+          description: The deposit to update
+          required: true
+          schema:
+            type: object
+            properties:
+              issuer:
+                type: integer
+              members:
+                type: array
+                items:
+                  type: integer
+              amount:
+                type: number
+              description:
+                type: string
+      responses:
+        '200':
+          description: Deposit updated successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+    delete:
+      summary: Delete a deposit
+      description: Deletes a deposit transaction by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: The ID of the deposit to delete
+      responses:
+        '200':
+          description: Deposit deleted successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+  /withdraw:
+    post:
+      summary: Create a new withdrawal
+      description: Creates a new withdrawal transaction
+      parameters:
+        - in: body
+          name: withdraw
+          description: The withdrawal to create
+          required: true
+          schema:
+            type: object
+            properties:
+              issuer:
+                type: integer
+              deposit_id:
+                type: integer
+              amount:
+                type: number
+              description:
+                type: string
+      responses:
+        '200':
+          description: Withdrawal created successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+    put:
+      summary: Update a withdrawal
+      description: Updates an existing withdrawal transaction
+      parameters:
+        - in: body
+          name: withdraw
+          description: The withdrawal to update
+          required: true
+          schema:
+            type: object
+            properties:
+              issuer:
+                type: integer
+              deposit_id:
+                type: integer
+              amount:
+                type: number
+              description:
+                type: string
+      responses:
+        '200':
+          description: Withdrawal updated successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+    delete:
+      summary: Delete a withdrawal
+      description: Deletes a withdrawal transaction by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: The ID of the withdrawal to delete
+      responses:
+        '200':
+          description: Withdrawal deleted successfully
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+definitions:
+  JSONResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      description:
+        type: string
