@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/deposinator/db"
+	"github.com/deposinator/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -14,14 +15,16 @@ func AuthMiddleware() gin.HandlerFunc {
 		session := sessions.Default(c)
 		sessionID := session.Get("userID")
 		if sessionID == nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.GenerateJSONResponse("error", "user is not logged in"))
+			return
 		}
 
 		userId := sessionID.(int)
 		// Check if the user exists
 		user := db.UserFromId(userId)
 		if user.Id == 0 {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.GenerateJSONResponse("error", "user does not exist"))
+			return
 		}
 
 		c.Set("userID", user.Id)

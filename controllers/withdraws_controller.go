@@ -4,71 +4,63 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/deposinator/db"
+	"github.com/deposinator/models"
+	"github.com/deposinator/utils"
 	"github.com/gin-gonic/gin"
 )
 
-type withdrawData struct {
-	Id          int       `json:"id,omitempty"`
-	Issuer      string    `form:"issuer"`
-	Deposit_id  int       `json:"deposit_id"`
-	Amount      int       `form:"amount"`
-	Description string    `form:"description"`
-	Created_at  time.Time `json:"created_at,omitempty"`
-}
-
 func WithdrawCreate(c *gin.Context) {
-	var data withdrawData
-	if err := c.BindJSON(&data); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	var withdraw *models.Withdraw
+	if err := c.BindJSON(&withdraw); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
-	err := db.WithdrawCreate(data.Issuer, data.Deposit_id, data.Amount, data.Description)
+	err := db.WithdrawCreate(withdraw.Issuer, withdraw.Deposit_id, withdraw.Amount, withdraw.Description)
 	if err != nil {
 		log.Println("error creating withdraw: ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
 }
 
 func WithdrawUpdate(c *gin.Context) {
-	var data withdrawData
-	if err := c.BindJSON(&data); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	var withdraw *models.Withdraw
+	if err := c.BindJSON(&withdraw); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
-	err := db.WithdrawUpdate(data.Id, data.Issuer, data.Deposit_id, data.Amount, data.Description)
+	err := db.WithdrawUpdate(withdraw.Id, withdraw.Issuer, withdraw.Deposit_id, withdraw.Amount, withdraw.Description)
 	if err != nil {
 		log.Println("error updating withdraw: ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
 }
 
 func WithdrawDelete(c *gin.Context) {
 	id := c.Query("id")
 	if id == "" {
 		log.Println("id parameter not found")
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "missing id parameter"))
 		return
 	}
 	deposit_id, err := strconv.Atoi(id)
 	if err != nil {
 		log.Println("invalid deposit id: ", id)
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 	err = db.WithdrawDelete(deposit_id)
 	if err != nil {
 		log.Println("error deleting withdraw: ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
 }

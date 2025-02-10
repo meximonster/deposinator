@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	ENVIRONMENT   string `yaml:"ENVIRONMENT"`
 	HTTP_PORT     string `yaml:"HTTP_PORT"`
 	POSTGRES_HOST string `yaml:"POSTGRES_HOST"`
 	POSTGRES_USER string `yaml:"POSTGRES_USER"`

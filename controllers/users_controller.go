@@ -5,66 +5,73 @@ import (
 	"net/http"
 
 	"github.com/deposinator/db"
+	"github.com/deposinator/models"
+	"github.com/deposinator/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-type userData struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func Signup(c *gin.Context) {
-	var data userData
-	if err := c.BindJSON(&data); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	var user models.User
+	err := c.BindJSON(&user)
+	if err != nil {
+		log.Println("error binding user: ", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
-	exists, err := db.UserExists(data.Username, data.Email)
+	err = user.Validate()
+	if err != nil {
+		log.Println("error validating user: ", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
+
+	exists, err := db.UserExists(user.Username, user.Email)
 	if err != nil {
 		log.Println("error checking user status: ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
 	if exists {
-		log.Println("user exists: ", data.Username)
-		c.AbortWithStatus(http.StatusBadRequest)
+		log.Println("user exists: ", user.Username)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "user already exists"))
 		return
 	}
 
-	userID, err := db.UserCreate(data.Username, data.Email, data.Password)
+	userID, err := db.UserCreate(user.Username, user.Email, user.Password)
 	if err != nil {
-		log.Printf("error creating user %s: %s", data.Username, err.Error())
-		c.AbortWithStatus(http.StatusInternalServerError)
+		log.Printf("error creating user %s: %s", user.Username, err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
 	session := sessions.Default(c)
 	session.Set("userID", userID)
 	session.Save()
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
 }
 
 func Login(c *gin.Context) {
-	var data userData
-	if err := c.BindJSON(&data); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	var user models.User
+	err := c.BindJSON(&user)
+	if err != nil {
+		log.Println("error binding user: ", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
-	user := db.MatchUserPassword(data.Email, data.Password)
-	if user.Id == 0 {
-		c.AbortWithStatus(http.StatusUnauthorized)
+	u := db.MatchUserPassword(user.Email, user.Password)
+	if u.Id == 0 {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.GenerateJSONResponse("error", "user not found"))
 		return
 	}
 
 	session := sessions.Default(c)
-	session.Set("userID", user.Id)
+	session.Set("userID", u.Id)
 	session.Save()
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
 }
 
 func Logout(c *gin.Context) {
@@ -72,5 +79,5 @@ func Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
 }

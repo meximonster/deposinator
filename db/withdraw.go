@@ -1,16 +1,5 @@
 package db
 
-import "time"
-
-type Withdraw struct {
-	Id          int
-	Issuer      string
-	Deposit_id  int
-	Amount      int
-	Description string
-	Created_at  time.Time
-}
-
 func WithdrawCreate(issuer string, deposit_id int, amount int, description string) error {
 	q := "INSERT INTO withdraws (issuer, deposit_id, amount, description) VALUES ($1, $2, $3, $4) RETURNING id"
 	_, err := db.Exec(q, issuer, deposit_id, amount, description)

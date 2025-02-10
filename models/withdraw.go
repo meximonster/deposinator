@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Withdraw struct {
 	Id          int
@@ -9,4 +12,11 @@ type Withdraw struct {
 	Amount      int
 	Description string
 	Created_at  time.Time
+}
+
+func (w *Withdraw) Validate() error {
+	if len(w.Description) > 100 {
+		return errors.New("invalid description length")
+	}
+	return nil
 }

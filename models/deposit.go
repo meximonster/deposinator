@@ -1,12 +1,22 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Deposit struct {
-	Id          int
-	Issuer      string
-	Members     []int
-	Amount      int
-	Description string
-	Created_at  time.Time
+	Id          int       `json:"id,omitempty"`
+	Issuer      string    `json:"issuer"`
+	Members     []int     `json:"members"`
+	Amount      int       `json:"amount"`
+	Description string    `json:"description"`
+	Created_at  time.Time `json:"created_at,omitempty"`
+}
+
+func (d *Deposit) Validate() error {
+	if len(d.Description) > 100 {
+		return errors.New("invalid description length")
+	}
+	return nil
 }

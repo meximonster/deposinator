@@ -20,5 +20,5 @@ func main() {
 		log.Fatal("error connecting to db: ", err)
 	}
 
-	server.Run(c.HTTP_PORT, c.STORE_KEY)
+	server.Run(c.ENVIRONMENT, c.HTTP_PORT, c.STORE_KEY)
 }
