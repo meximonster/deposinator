@@ -48,13 +48,16 @@ func Run(env string, port string, storeKey string) {
 		deposits.PUT("/", middlewares.AuthMiddleware(), controllers.DepositUpdate)
 		deposits.DELETE("/:id", middlewares.AuthMiddleware(), controllers.DepositDelete)
 	}
+	r.GET("/deposits", middlewares.AuthMiddleware(), controllers.GetDeposits)
 
 	withdraws := r.Group("/withdraw")
 	{
+		withdraws.GET("/", middlewares.AuthMiddleware(), controllers.GetWithdraws)
 		withdraws.POST("/", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
 		withdraws.PUT("/", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
 		withdraws.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
 	}
+	r.GET("/withdraws", middlewares.AuthMiddleware(), controllers.GetWithdraws)
 
 	r.Static("/swagger-ui", "./swagger-ui")
 	r.StaticFile("/docs/swagger.yml", "./docs/swagger.yml")

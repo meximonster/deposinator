@@ -4,6 +4,15 @@ import (
 	"github.com/deposinator/models"
 )
 
+func GetDeposits(query string, args ...interface{}) ([]models.Deposit, error) {
+	var deposits []models.Deposit
+	err := db.Select(&deposits, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return deposits, nil
+}
+
 func DepositCreate(issuer int, members []int, amount int, description string) error {
 	q := "INSERT INTO deposits (issuer, amount, description) VALUES ($1, $2, $3) RETURNING id"
 	var id int
@@ -31,15 +40,6 @@ func DepositDelete(id int) error {
 	q := "DELETE FROM deposits where id = $1"
 	_, err := db.Exec(q, id)
 	return err
-}
-
-func DepositFromId(id int) *models.Deposit {
-	var deposit models.Deposit
-	err := db.Get(&deposit, "SELECT * FROM deposits WHERE id = $1", id)
-	if err != nil {
-		return &models.Deposit{}
-	}
-	return &deposit
 }
 
 func insertDepositMembers(deposit_id int, members []int) error {

@@ -6,12 +6,12 @@ import (
 )
 
 type Deposit struct {
-	Id          int       `json:"id,omitempty"`
-	Issuer      int       `json:"issuer"`
-	Members     []int     `json:"members"`
-	Amount      int       `json:"amount"`
-	Description string    `json:"description"`
-	Created_at  time.Time `json:"created_at,omitempty"`
+	Id          int       `db:"id" json:"id,omitempty"`
+	Issuer      int       `db:"issuer" json:"issuer"`
+	Members     []int     `db:"members" json:"members"`
+	Amount      int       `db:"amount" json:"amount"`
+	Description string    `db:"description" json:"description"`
+	Created_at  time.Time `db:"created_at" json:"created_at,omitempty"`
 }
 
 func (d *Deposit) Validate() error {

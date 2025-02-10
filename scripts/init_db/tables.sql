@@ -32,3 +32,11 @@ CREATE TABLE withdraws
     description   VARCHAR(100)  NOT NULL,
     created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
 );
+
+CREATE INDEX idx_deposits_issuer ON deposits (issuer);
+CREATE INDEX idx_deposits_date ON deposits (created_at);
+
+CREATE INDEX idx_deposit_members_deposit_id ON deposit_members (deposit_id);
+
+CREATE INDEX idx_withdraws_issuer ON withdraws (issuer);
+CREATE INDEX idx_withdraws_date ON withdraws (created_at);

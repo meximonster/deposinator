@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,6 +11,76 @@ import (
 	"github.com/deposinator/utils"
 	"github.com/gin-gonic/gin"
 )
+
+func GetWithdraws(c *gin.Context) {
+	// Parse query parameters
+	issuer := c.Query("issuer")
+	depositID := c.Query("deposit_id")
+	minAmount := c.Query("min_amount")
+	maxAmount := c.Query("max_amount")
+	description := c.Query("description")
+	createdAfter := c.Query("created_after")
+	createdBefore := c.Query("created_before")
+	sortBy := c.DefaultQuery("sort_by", "created_at")
+	sortOrder := c.DefaultQuery("sort_order", "desc")
+	limit := c.DefaultQuery("limit", "10")
+	offset := c.DefaultQuery("offset", "0")
+
+	query := `
+		SELECT id, issuer, deposit_id, amount, description, created_at
+		FROM withdraws
+		WHERE 1=1
+	`
+	var args []interface{}
+	argIndex := 1
+
+	if issuer != "" {
+		query += fmt.Sprintf(" AND issuer = $%d", argIndex)
+		args = append(args, issuer)
+		argIndex++
+	}
+	if depositID != "" {
+		query += fmt.Sprintf(" AND deposit_id = $%d", argIndex)
+		args = append(args, depositID)
+		argIndex++
+	}
+	if minAmount != "" {
+		query += fmt.Sprintf(" AND amount >= $%d", argIndex)
+		args = append(args, minAmount)
+		argIndex++
+	}
+	if maxAmount != "" {
+		query += fmt.Sprintf(" AND amount <= $%d", argIndex)
+		args = append(args, maxAmount)
+		argIndex++
+	}
+	if description != "" {
+		query += fmt.Sprintf(" AND description ILIKE $%d", argIndex)
+		args = append(args, "%"+description+"%")
+		argIndex++
+	}
+	if createdAfter != "" {
+		query += fmt.Sprintf(" AND created_at >= $%d", argIndex)
+		args = append(args, createdAfter)
+		argIndex++
+	}
+	if createdBefore != "" {
+		query += fmt.Sprintf(" AND created_at <= $%d", argIndex)
+		args = append(args, createdBefore)
+		argIndex++
+	}
+
+	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, argIndex, argIndex+1)
+	args = append(args, limit, offset)
+
+	withdraws, err := db.GetWithdraws(query, args...)
+	if err != nil {
+		log.Printf("error getting deposits. query: %s, error %s\n", query, err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, utils.GenerateJSONResultResponse("success", "OK", withdraws))
+}
 
 func WithdrawCreate(c *gin.Context) {
 	var withdraw *models.Withdraw

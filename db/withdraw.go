@@ -1,5 +1,16 @@
 package db
 
+import "github.com/deposinator/models"
+
+func GetWithdraws(query string, args ...interface{}) ([]models.Withdraw, error) {
+	var withdraws []models.Withdraw
+	err := db.Select(&withdraws, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return withdraws, nil
+}
+
 func WithdrawCreate(issuer int, deposit_id int, amount int, description string) error {
 	q := "INSERT INTO withdraws (issuer, deposit_id, amount, description) VALUES ($1, $2, $3, $4) RETURNING id"
 	_, err := db.Exec(q, issuer, deposit_id, amount, description)
