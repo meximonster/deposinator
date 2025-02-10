@@ -3,7 +3,7 @@ info:
   title: Go API
   description: API for managing users, deposits, and withdrawals
   version: 1.0.0
-basePath: /api
+basePath: /
 schemes:
   - http
 consumes:
@@ -68,6 +68,132 @@ paths:
           schema:
             $ref: '#/definitions/JSONResponse'
 
+  /deposits:
+    get:
+      summary: Get filtered deposits
+      description: Retrieve a list of deposits based on filters
+      parameters:
+        - in: query
+          name: issuer
+          type: integer
+          description: Filter by the user who created the deposit
+        - in: query
+          name: member
+          type: integer
+          description: Filter by a member of the deposit
+        - in: query
+          name: min_amount
+          type: integer
+          description: Filter by minimum deposit amount
+        - in: query
+          name: max_amount
+          type: integer
+          description: Filter by maximum deposit amount
+        - in: query
+          name: description
+          type: string
+          description: Filter by deposit description (partial match)
+        - in: query
+          name: created_after
+          type: string
+          format: date-time
+          description: Filter deposits created after a specific timestamp
+        - in: query
+          name: created_before
+          type: string
+          format: date-time
+          description: Filter deposits created before a specific timestamp
+        - in: query
+          name: sort_by
+          type: string
+          description: Sort by a field (e.g., amount, created_at)
+          default: created_at
+        - in: query
+          name: sort_order
+          type: string
+          description: Sort order (asc or desc)
+          default: desc
+        - in: query
+          name: limit
+          type: integer
+          description: Limit the number of results (for pagination)
+          default: 10
+        - in: query
+          name: offset
+          type: integer
+          description: Offset for pagination
+          default: 0
+      responses:
+        '200':
+          description: A list of deposits
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Deposit'
+
+  /withdrawals:
+    get:
+      summary: Get filtered withdrawals
+      description: Retrieve a list of withdrawals based on filters
+      parameters:
+        - in: query
+          name: issuer
+          type: integer
+          description: Filter by the user who created the withdrawal
+        - in: query
+          name: deposit_id
+          type: integer
+          description: Filter by the associated deposit ID
+        - in: query
+          name: min_amount
+          type: integer
+          description: Filter by minimum withdrawal amount
+        - in: query
+          name: max_amount
+          type: integer
+          description: Filter by maximum withdrawal amount
+        - in: query
+          name: description
+          type: string
+          description: Filter by withdrawal description (partial match)
+        - in: query
+          name: created_after
+          type: string
+          format: date-time
+          description: Filter withdrawals created after a specific timestamp
+        - in: query
+          name: created_before
+          type: string
+          format: date-time
+          description: Filter withdrawals created before a specific timestamp
+        - in: query
+          name: sort_by
+          type: string
+          description: Sort by a field (e.g., amount, created_at)
+          default: created_at
+        - in: query
+          name: sort_order
+          type: string
+          description: Sort order (asc or desc)
+          default: desc
+        - in: query
+          name: limit
+          type: integer
+          description: Limit the number of results (for pagination)
+          default: 10
+        - in: query
+          name: offset
+          type: integer
+          description: Offset for pagination
+          default: 0
+      responses:
+        '200':
+          description: A list of withdrawals
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Withdrawal'
+
   /deposit:
     post:
       summary: Create a new deposit
@@ -78,18 +204,7 @@ paths:
           description: The deposit to create
           required: true
           schema:
-            type: object
-            properties:
-              issuer:
-                type: integer
-              members:
-                type: array
-                items:
-                  type: integer
-              amount:
-                type: number
-              description:
-                type: string
+            $ref: '#/definitions/DepositRequest'
       responses:
         '200':
           description: Deposit created successfully
@@ -105,18 +220,7 @@ paths:
           description: The deposit to update
           required: true
           schema:
-            type: object
-            properties:
-              issuer:
-                type: integer
-              members:
-                type: array
-                items:
-                  type: integer
-              amount:
-                type: number
-              description:
-                type: string
+            $ref: '#/definitions/DepositRequest'
       responses:
         '200':
           description: Deposit updated successfully
@@ -148,16 +252,7 @@ paths:
           description: The withdrawal to create
           required: true
           schema:
-            type: object
-            properties:
-              issuer:
-                type: integer
-              deposit_id:
-                type: integer
-              amount:
-                type: number
-              description:
-                type: string
+            $ref: '#/definitions/WithdrawalRequest'
       responses:
         '200':
           description: Withdrawal created successfully
@@ -173,16 +268,7 @@ paths:
           description: The withdrawal to update
           required: true
           schema:
-            type: object
-            properties:
-              issuer:
-                type: integer
-              deposit_id:
-                type: integer
-              amount:
-                type: number
-              description:
-                type: string
+            $ref: '#/definitions/WithdrawalRequest'
       responses:
         '200':
           description: Withdrawal updated successfully
@@ -210,5 +296,63 @@ definitions:
     properties:
       status:
         type: string
+      description:
+        type: string
+
+  Deposit:
+    type: object
+    properties:
+      id:
+        type: integer
+      issuer:
+        type: integer
+      amount:
+        type: integer
+      description:
+        type: string
+      created_at:
+        type: string
+        format: date-time
+
+  Withdrawal:
+    type: object
+    properties:
+      id:
+        type: integer
+      issuer:
+        type: integer
+      deposit_id:
+        type: integer
+      amount:
+        type: integer
+      description:
+        type: string
+      created_at:
+        type: string
+        format: date-time
+
+  DepositRequest:
+    type: object
+    properties:
+      issuer:
+        type: integer
+      members:
+        type: array
+        items:
+          type: integer
+      amount:
+        type: integer
+      description:
+        type: string
+
+  WithdrawalRequest:
+    type: object
+    properties:
+      issuer:
+        type: integer
+      deposit_id:
+        type: integer
+      amount:
+        type: integer
       description:
         type: string

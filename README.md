@@ -8,8 +8,4 @@
 
 ## Populate the db
 
-> make users
-
-## Clean the db
-
-> make clean
+> make data
