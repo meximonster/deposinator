@@ -40,7 +40,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	userID, err := db.UserCreate(user.Username, user.Email, user.Password)
+	user.Id, err = db.UserCreate(user.Username, user.Email, user.Password)
 	if err != nil {
 		log.Printf("error creating user %s: %s", user.Username, err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
@@ -48,9 +48,9 @@ func Signup(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	session.Set("userID", userID)
+	session.Set("userID", user.Id)
 	session.Save()
-	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
+	c.JSON(http.StatusOK, utils.GenerateJSONResultResponse("success", "OK", user))
 }
 
 func Login(c *gin.Context) {
@@ -71,7 +71,7 @@ func Login(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("userID", u.Id)
 	session.Save()
-	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
+	c.JSON(http.StatusOK, utils.GenerateJSONResultResponse("success", "OK", u))
 }
 
 func Logout(c *gin.Context) {

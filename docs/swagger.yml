@@ -32,9 +32,9 @@ paths:
                 type: string
       responses:
         '200':
-          description: User created successfully
+          description: OK
           schema:
-            $ref: '#/definitions/JSONResponse'
+            $ref: '#/definitions/UserResponse'
 
   /users/login:
     post:
@@ -54,9 +54,9 @@ paths:
                 type: string
       responses:
         '200':
-          description: User logged in successfully
+          description: OK
           schema:
-            $ref: '#/definitions/JSONResponse'
+            $ref: '#/definitions/UserResponse'
 
   /users/logout:
     delete:
@@ -64,7 +64,7 @@ paths:
       description: Invalidates the user's authentication token
       responses:
         '200':
-          description: User logged out successfully
+          description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
 
@@ -129,7 +129,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Deposit'
+              $ref: '#/definitions/DepositResponse'
 
   /withdrawals:
     get:
@@ -207,7 +207,7 @@ paths:
             $ref: '#/definitions/DepositRequest'
       responses:
         '200':
-          description: Deposit created successfully
+          description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
 
@@ -223,7 +223,7 @@ paths:
             $ref: '#/definitions/DepositRequest'
       responses:
         '200':
-          description: Deposit updated successfully
+          description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
 
@@ -238,7 +238,7 @@ paths:
           description: The ID of the deposit to delete
       responses:
         '200':
-          description: Deposit deleted successfully
+          description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
 
@@ -255,7 +255,7 @@ paths:
             $ref: '#/definitions/WithdrawalRequest'
       responses:
         '200':
-          description: Withdrawal created successfully
+          description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
 
@@ -271,7 +271,7 @@ paths:
             $ref: '#/definitions/WithdrawalRequest'
       responses:
         '200':
-          description: Withdrawal updated successfully
+          description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
 
@@ -286,9 +286,9 @@ paths:
           description: The ID of the withdrawal to delete
       responses:
         '200':
-          description: Withdrawal deleted successfully
+          description: OK
           schema:
-            $ref: '#/definitions/JSONResponse'
+            $ref: '#/definitions/WithdrawalResponse'
 
 definitions:
   JSONResponse:
@@ -298,6 +298,37 @@ definitions:
         type: string
       description:
         type: string
+
+  UserResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      description:
+        type: string
+      result:
+        type: object
+        properties:
+          id:
+            type: integer
+          username:
+            type: string
+          password:
+            type: string
+          email:
+            type: string
+
+  DepositResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      description:
+        type: string
+      result:
+        type: array
+        items:
+          $ref: '#/definitions/Deposit'
 
   Deposit:
     type: object
@@ -313,6 +344,18 @@ definitions:
       created_at:
         type: string
         format: date-time
+
+  WithdrawalResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      description:
+        type: string
+      result:
+        type: array
+        items:
+          $ref: '#/definitions/Withdrawal'
 
   Withdrawal:
     type: object
