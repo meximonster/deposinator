@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetWithdraws(c *gin.Context) {
+func GetWithdrawals(c *gin.Context) {
 	// Parse query parameters
 	issuer := c.Query("issuer")
 	depositID := c.Query("deposit_id")
@@ -73,7 +73,7 @@ func GetWithdraws(c *gin.Context) {
 	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, argIndex, argIndex+1)
 	args = append(args, limit, offset)
 
-	withdraws, err := db.GetWithdraws(query, args...)
+	withdraws, err := db.GetWithdrawals(query, args...)
 	if err != nil {
 		log.Printf("error getting deposits. query: %s, error %s\n", query, err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))

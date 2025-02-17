@@ -12,6 +12,17 @@ produces:
   - application/json
 
 paths:
+  /users:
+    get:
+      summary: Get all users
+      description: Retrieve all users
+      responses:
+        '200':
+          description: A list of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UsersResponse'
   /users/signup:
     post:
       summary: Sign up a new user
@@ -192,7 +203,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Withdrawal'
+              $ref: '#/definitions/WithdrawalResponse'
 
   /deposit:
     post:
@@ -317,6 +328,27 @@ definitions:
             type: string
           email:
             type: string
+
+  UsersResponse:
+    type: object
+    properties:
+      status:
+        type: string
+      description:
+        type: string
+      result:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            password:
+              type: string
+            email:
+              type: string
 
   DepositResponse:
     type: object

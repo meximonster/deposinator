@@ -11,6 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetUsers(c *gin.Context) {
+	users, err := db.GetUsers()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
+	}
+	c.JSON(http.StatusOK, utils.GenerateJSONResultResponse("success", "OK", users))
+}
+
 func Signup(c *gin.Context) {
 	var user models.User
 	err := c.BindJSON(&user)
@@ -75,7 +83,6 @@ func Login(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	// Delete the session
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()

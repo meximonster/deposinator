@@ -2,7 +2,7 @@ package db
 
 import "github.com/deposinator/models"
 
-func GetWithdraws(query string, args ...interface{}) ([]models.Withdraw, error) {
+func GetWithdrawals(query string, args ...interface{}) ([]models.Withdraw, error) {
 	var withdraws []models.Withdraw
 	err := db.Select(&withdraws, query, args...)
 	if err != nil {

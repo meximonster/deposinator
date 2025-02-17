@@ -10,15 +10,12 @@ import (
 func UserExists(username string, email string) (bool, error) {
 	var user models.User
 	err := db.Get(&user, "SELECT * FROM users WHERE username = $1 OR email = $2", username, email)
-	// user does not exist
 	if err == sql.ErrNoRows {
 		return false, nil
 	}
-	// error getting user
 	if err != nil {
 		return false, err
 	}
-	// user exists
 	return true, nil
 }
 
@@ -56,4 +53,13 @@ func UserFromId(id int) *models.User {
 		return &models.User{}
 	}
 	return &user
+}
+
+func GetUsers() ([]models.User, error) {
+	var users []models.User
+	err := db.Select(&users, "SELECT id, username FROM users")
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }

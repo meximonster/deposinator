@@ -37,6 +37,7 @@ func Run(env string, port string, storeKey string) {
 
 	users := r.Group("/users")
 	{
+		users.GET("/", controllers.GetUsers)
 		users.POST("/signup", controllers.Signup)
 		users.POST("/login", controllers.Login)
 		users.DELETE("/logout", controllers.Logout)
@@ -52,12 +53,11 @@ func Run(env string, port string, storeKey string) {
 
 	withdraws := r.Group("/withdraw")
 	{
-		withdraws.GET("/", middlewares.AuthMiddleware(), controllers.GetWithdraws)
 		withdraws.POST("/", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
 		withdraws.PUT("/", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
 		withdraws.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
 	}
-	r.GET("/withdraws", middlewares.AuthMiddleware(), controllers.GetWithdraws)
+	r.GET("/withdrawals", middlewares.AuthMiddleware(), controllers.GetWithdrawals)
 
 	r.Static("/swagger-ui", "./swagger-ui")
 	r.StaticFile("/docs/swagger.yml", "./docs/swagger.yml")

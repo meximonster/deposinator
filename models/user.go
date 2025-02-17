@@ -10,7 +10,7 @@ type User struct {
 	Username   string    `json:"username,omitempty"`
 	Email      string    `json:"email" binding:"required,email"`
 	Password   string    `json:"password" binding:"required"`
-	Created_at time.Time `json:"created_at,omitempty"`
+	Created_at time.Time `json:"-"`
 }
 
 func (u *User) Validate() error {
