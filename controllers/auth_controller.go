@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Signup(c *gin.Context) {
+func Register(c *gin.Context) {
 	var user models.User
 	err := c.BindJSON(&user)
 	if err != nil {

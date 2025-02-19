@@ -23,7 +23,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/UsersResponse'
-  /auth/signup:
+  /auth/register:
     post:
       summary: Sign up a new user
       description: Creates a new user account

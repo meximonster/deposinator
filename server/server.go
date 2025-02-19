@@ -37,7 +37,7 @@ func Run(env string, port string, storeKey string) {
 
 	auth := r.Group("/auth")
 	{
-		auth.POST("/signup", controllers.Signup)
+		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
 		auth.DELETE("/logout", controllers.Logout)
 	}
