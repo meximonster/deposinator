@@ -55,12 +55,12 @@ func Run(env string, port string, storeKey string) {
 		deposits.DELETE("/:id", middlewares.AuthMiddleware(), controllers.DepositDelete)
 	}
 
-	withdraws := r.Group("/withdraws")
+	withdrawals := r.Group("/withdrawals")
 	{
-		withdraws.GET("", middlewares.AuthMiddleware(), controllers.GetWithdrawals)
-		withdraws.POST("", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
-		withdraws.PUT("", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
-		withdraws.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
+		withdrawals.GET("", middlewares.AuthMiddleware(), controllers.GetWithdrawals)
+		withdrawals.POST("", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
+		withdrawals.PUT("", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
+		withdrawals.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
 	}
 
 	r.Static("/swagger-ui", "./swagger-ui")
