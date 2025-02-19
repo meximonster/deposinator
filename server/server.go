@@ -35,29 +35,33 @@ func Run(env string, port string, storeKey string) {
 		}))
 	}
 
-	users := r.Group("/users")
+	auth := r.Group("/auth")
 	{
-		users.GET("/", controllers.GetUsers)
-		users.POST("/signup", controllers.Signup)
-		users.POST("/login", controllers.Login)
-		users.DELETE("/logout", controllers.Logout)
+		auth.POST("/signup", controllers.Signup)
+		auth.POST("/login", controllers.Login)
+		auth.DELETE("/logout", controllers.Logout)
 	}
 
-	deposits := r.Group("/deposit")
+	users := r.Group("/users")
 	{
+		users.GET("/", middlewares.AuthMiddleware(), controllers.GetUsers)
+	}
+
+	deposits := r.Group("/deposits")
+	{
+		deposits.GET("/", middlewares.AuthMiddleware(), controllers.GetDeposits)
 		deposits.POST("/", middlewares.AuthMiddleware(), controllers.DepositCreate)
 		deposits.PUT("/", middlewares.AuthMiddleware(), controllers.DepositUpdate)
 		deposits.DELETE("/:id", middlewares.AuthMiddleware(), controllers.DepositDelete)
 	}
-	r.GET("/deposits", middlewares.AuthMiddleware(), controllers.GetDeposits)
 
-	withdraws := r.Group("/withdraw")
+	withdraws := r.Group("/withdraws")
 	{
+		withdraws.GET("/", middlewares.AuthMiddleware(), controllers.GetWithdrawals)
 		withdraws.POST("/", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
 		withdraws.PUT("/", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
 		withdraws.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
 	}
-	r.GET("/withdrawals", middlewares.AuthMiddleware(), controllers.GetWithdrawals)
 
 	r.Static("/swagger-ui", "./swagger-ui")
 	r.StaticFile("/docs/swagger.yml", "./docs/swagger.yml")

@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Go API
   description: API for managing users, deposits, and withdrawals
-  version: 1.0.0
+  version: 1.0.1
 basePath: /
 schemes:
   - http
@@ -23,7 +23,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/UsersResponse'
-  /users/signup:
+  /auth/signup:
     post:
       summary: Sign up a new user
       description: Creates a new user account
@@ -47,7 +47,7 @@ paths:
           schema:
             $ref: '#/definitions/UserResponse'
 
-  /users/login:
+  /auth/login:
     post:
       summary: Log in a user
       description: Authenticates a user and returns a token
@@ -69,7 +69,7 @@ paths:
           schema:
             $ref: '#/definitions/UserResponse'
 
-  /users/logout:
+  /auth/logout:
     delete:
       summary: Log out a user
       description: Invalidates the user's authentication token
@@ -142,6 +142,53 @@ paths:
             items:
               $ref: '#/definitions/DepositResponse'
 
+    post:
+      summary: Create a new deposit
+      description: Creates a new deposit transaction
+      parameters:
+        - in: body
+          name: deposit
+          description: The deposit to create
+          required: true
+          schema:
+            $ref: '#/definitions/DepositRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+    put:
+      summary: Update a deposit
+      description: Updates an existing deposit transaction
+      parameters:
+        - in: body
+          name: deposit
+          description: The deposit to update
+          required: true
+          schema:
+            $ref: '#/definitions/DepositRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
+    delete:
+      summary: Delete a deposit
+      description: Deletes a deposit transaction by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          description: The ID of the deposit to delete
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/JSONResponse'
+
   /withdrawals:
     get:
       summary: Get filtered withdrawals
@@ -205,55 +252,6 @@ paths:
             items:
               $ref: '#/definitions/WithdrawalResponse'
 
-  /deposit:
-    post:
-      summary: Create a new deposit
-      description: Creates a new deposit transaction
-      parameters:
-        - in: body
-          name: deposit
-          description: The deposit to create
-          required: true
-          schema:
-            $ref: '#/definitions/DepositRequest'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONResponse'
-
-    put:
-      summary: Update a deposit
-      description: Updates an existing deposit transaction
-      parameters:
-        - in: body
-          name: deposit
-          description: The deposit to update
-          required: true
-          schema:
-            $ref: '#/definitions/DepositRequest'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONResponse'
-
-    delete:
-      summary: Delete a deposit
-      description: Deletes a deposit transaction by ID
-      parameters:
-        - in: path
-          name: id
-          required: true
-          type: integer
-          description: The ID of the deposit to delete
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONResponse'
-
-  /withdraw:
     post:
       summary: Create a new withdrawal
       description: Creates a new withdrawal transaction
