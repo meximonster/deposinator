@@ -20,13 +20,9 @@ func UserExists(username string, email string) (bool, error) {
 }
 
 func UserCreate(username string, email string, password string) (int, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return -1, err
-	}
 	q := "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id"
 	var id int
-	err = db.QueryRow(q, username, email, hashedPassword).Scan(&id)
+	err := db.QueryRow(q, username, email, password).Scan(&id)
 	if err != nil {
 		return -1, err
 	}

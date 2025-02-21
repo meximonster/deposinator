@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Go API
-  description: API for managing users, deposits, and withdrawals
+  description: API for managing users, sessions, and withdrawals
   version: 1.0.1
 basePath: /
 schemes:
@@ -79,41 +79,41 @@ paths:
           schema:
             $ref: '#/definitions/JSONResponse'
 
-  /deposits:
+  /sessions:
     get:
-      summary: Get filtered deposits
-      description: Retrieve a list of deposits based on filters
+      summary: Get filtered sessions
+      description: Retrieve a list of sessions based on filters
       parameters:
         - in: query
           name: issuer
           type: integer
-          description: Filter by the user who created the deposit
+          description: Filter by the user who created the session
         - in: query
           name: member
           type: integer
-          description: Filter by a member of the deposit
+          description: Filter by a member of the session
         - in: query
           name: min_amount
           type: integer
-          description: Filter by minimum deposit amount
+          description: Filter by minimum session amount
         - in: query
           name: max_amount
           type: integer
-          description: Filter by maximum deposit amount
+          description: Filter by maximum session amount
         - in: query
           name: description
           type: string
-          description: Filter by deposit description (partial match)
+          description: Filter by session description (partial match)
         - in: query
           name: created_after
           type: string
           format: date-time
-          description: Filter deposits created after a specific timestamp
+          description: Filter sessions created after a specific timestamp
         - in: query
           name: created_before
           type: string
           format: date-time
-          description: Filter deposits created before a specific timestamp
+          description: Filter sessions created before a specific timestamp
         - in: query
           name: sort_by
           type: string
@@ -136,22 +136,22 @@ paths:
           default: 0
       responses:
         '200':
-          description: A list of deposits
+          description: A list of sessions
           schema:
             type: array
             items:
-              $ref: '#/definitions/DepositResponse'
+              $ref: '#/definitions/SessionResponse'
 
     post:
-      summary: Create a new deposit
-      description: Creates a new deposit transaction
+      summary: Create a new session
+      description: Creates a new session transaction
       parameters:
         - in: body
-          name: deposit
-          description: The deposit to create
+          name: session
+          description: The session to create
           required: true
           schema:
-            $ref: '#/definitions/DepositRequest'
+            $ref: '#/definitions/SessionCreate'
       responses:
         '200':
           description: OK
@@ -159,15 +159,15 @@ paths:
             $ref: '#/definitions/JSONResponse'
 
     put:
-      summary: Update a deposit
-      description: Updates an existing deposit transaction
+      summary: Update a session
+      description: Updates an existing session transaction
       parameters:
         - in: body
-          name: deposit
-          description: The deposit to update
+          name: session
+          description: The session to update
           required: true
           schema:
-            $ref: '#/definitions/DepositRequest'
+            $ref: '#/definitions/SessionUpdate'
       responses:
         '200':
           description: OK
@@ -175,129 +175,19 @@ paths:
             $ref: '#/definitions/JSONResponse'
 
     delete:
-      summary: Delete a deposit
-      description: Deletes a deposit transaction by ID
+      summary: Delete a session
+      description: Deletes a session transaction by ID
       parameters:
         - in: path
           name: id
           required: true
           type: integer
-          description: The ID of the deposit to delete
+          description: The ID of the session to delete
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/JSONResponse'
-
-  /withdrawals:
-    get:
-      summary: Get filtered withdrawals
-      description: Retrieve a list of withdrawals based on filters
-      parameters:
-        - in: query
-          name: issuer
-          type: integer
-          description: Filter by the user who created the withdrawal
-        - in: query
-          name: deposit_id
-          type: integer
-          description: Filter by the associated deposit ID
-        - in: query
-          name: min_amount
-          type: integer
-          description: Filter by minimum withdrawal amount
-        - in: query
-          name: max_amount
-          type: integer
-          description: Filter by maximum withdrawal amount
-        - in: query
-          name: description
-          type: string
-          description: Filter by withdrawal description (partial match)
-        - in: query
-          name: created_after
-          type: string
-          format: date-time
-          description: Filter withdrawals created after a specific timestamp
-        - in: query
-          name: created_before
-          type: string
-          format: date-time
-          description: Filter withdrawals created before a specific timestamp
-        - in: query
-          name: sort_by
-          type: string
-          description: Sort by a field (e.g., amount, created_at)
-          default: created_at
-        - in: query
-          name: sort_order
-          type: string
-          description: Sort order (asc or desc)
-          default: desc
-        - in: query
-          name: limit
-          type: integer
-          description: Limit the number of results (for pagination)
-          default: 10
-        - in: query
-          name: offset
-          type: integer
-          description: Offset for pagination
-          default: 0
-      responses:
-        '200':
-          description: A list of withdrawals
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/WithdrawalResponse'
-
-    post:
-      summary: Create a new withdrawal
-      description: Creates a new withdrawal transaction
-      parameters:
-        - in: body
-          name: withdraw
-          description: The withdrawal to create
-          required: true
-          schema:
-            $ref: '#/definitions/WithdrawalRequest'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONResponse'
-
-    put:
-      summary: Update a withdrawal
-      description: Updates an existing withdrawal transaction
-      parameters:
-        - in: body
-          name: withdraw
-          description: The withdrawal to update
-          required: true
-          schema:
-            $ref: '#/definitions/WithdrawalRequest'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/JSONResponse'
-
-    delete:
-      summary: Delete a withdrawal
-      description: Deletes a withdrawal transaction by ID
-      parameters:
-        - in: path
-          name: id
-          required: true
-          type: integer
-          description: The ID of the withdrawal to delete
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/WithdrawalResponse'
 
 definitions:
   JSONResponse:
@@ -348,7 +238,7 @@ definitions:
             email:
               type: string
 
-  DepositResponse:
+  SessionResponse:
     type: object
     properties:
       status:
@@ -358,9 +248,9 @@ definitions:
       result:
         type: array
         items:
-          $ref: '#/definitions/Deposit'
+          $ref: '#/definitions/Session'
 
-  Deposit:
+  Session:
     type: object
     properties:
       id:
@@ -369,34 +259,7 @@ definitions:
         type: integer
       amount:
         type: integer
-      description:
-        type: string
-      created_at:
-        type: string
-        format: date-time
-
-  WithdrawalResponse:
-    type: object
-    properties:
-      status:
-        type: string
-      description:
-        type: string
-      result:
-        type: array
-        items:
-          $ref: '#/definitions/Withdrawal'
-
-  Withdrawal:
-    type: object
-    properties:
-      id:
-        type: integer
-      issuer:
-        type: integer
-      deposit_id:
-        type: integer
-      amount:
+      withdraw_amount:
         type: integer
       description:
         type: string
@@ -404,7 +267,7 @@ definitions:
         type: string
         format: date-time
 
-  DepositRequest:
+  SessionCreate:
     type: object
     properties:
       issuer:
@@ -415,17 +278,25 @@ definitions:
           type: integer
       amount:
         type: integer
+      withdraw_amount:
+        type: integer
       description:
         type: string
 
-  WithdrawalRequest:
+  SessionUpdate:
     type: object
     properties:
+      id:
+        type: integer
       issuer:
         type: integer
-      deposit_id:
-        type: integer
+      members:
+        type: array
+        items:
+          type: integer
       amount:
+        type: integer
+      withdraw_amount:
         type: integer
       description:
         type: string

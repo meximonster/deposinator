@@ -47,20 +47,12 @@ func Run(env string, port string, storeKey string) {
 		users.GET("", middlewares.AuthMiddleware(), controllers.GetUsers)
 	}
 
-	deposits := r.Group("/deposits")
+	sessions := r.Group("/sessions")
 	{
-		deposits.GET("", middlewares.AuthMiddleware(), controllers.GetDeposits)
-		deposits.POST("", middlewares.AuthMiddleware(), controllers.DepositCreate)
-		deposits.PUT("", middlewares.AuthMiddleware(), controllers.DepositUpdate)
-		deposits.DELETE("/:id", middlewares.AuthMiddleware(), controllers.DepositDelete)
-	}
-
-	withdrawals := r.Group("/withdrawals")
-	{
-		withdrawals.GET("", middlewares.AuthMiddleware(), controllers.GetWithdrawals)
-		withdrawals.POST("", middlewares.AuthMiddleware(), controllers.WithdrawCreate)
-		withdrawals.PUT("", middlewares.AuthMiddleware(), controllers.WithdrawUpdate)
-		withdrawals.DELETE("/:id", middlewares.AuthMiddleware(), controllers.WithdrawDelete)
+		sessions.GET("", middlewares.AuthMiddleware(), controllers.GetSessions)
+		sessions.POST("", middlewares.AuthMiddleware(), controllers.SessionCreate)
+		sessions.PUT("", middlewares.AuthMiddleware(), controllers.SessionUpdate)
+		sessions.DELETE("/:id", middlewares.AuthMiddleware(), controllers.SessionDelete)
 	}
 
 	r.Static("/swagger-ui", "./swagger-ui")

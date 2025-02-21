@@ -7,36 +7,23 @@ CREATE TABLE users
     created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
 );
 
-CREATE TABLE deposits
+CREATE TABLE sessions
 (
-    id            serial        PRIMARY KEY,
-    issuer        INTEGER       REFERENCES users(id) ON DELETE CASCADE,
-    amount        INTEGER       NOT NULL,
-    description   VARCHAR(100)  NOT NULL,
-    created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
+    id              serial        PRIMARY KEY,
+    issuer          INTEGER       REFERENCES users(id) ON DELETE CASCADE,
+    amount          INTEGER       NOT NULL,
+    withdraw_amount INTEGER       NOT NULL,
+    description     VARCHAR(100)  NOT NULL,
+    created_at      TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
 );
 
-CREATE TABLE deposit_members
+CREATE TABLE session_members
 (
-    deposit_id    INTEGER       REFERENCES deposits(id) ON DELETE CASCADE,
+    session_id    INTEGER       REFERENCES sessions(id) ON DELETE CASCADE,
     user_id       INTEGER       REFERENCES users(id) ON DELETE CASCADE,
-    PRIMARY KEY (deposit_id, user_id)
+    PRIMARY KEY (session_id, user_id)
 );
 
-CREATE TABLE withdraws
-(
-    id            serial        PRIMARY KEY,
-    issuer        INTEGER       REFERENCES users(id) ON DELETE CASCADE,
-    deposit_id    INTEGER       REFERENCES deposits(id) ON DELETE CASCADE,
-    amount        INTEGER       NOT NULL,
-    description   VARCHAR(100)  NOT NULL,
-    created_at    TIMESTAMP     DEFAULT (now() at time zone 'Europe/Athens')
-);
-
-CREATE INDEX idx_deposits_issuer ON deposits (issuer);
-CREATE INDEX idx_deposits_date ON deposits (created_at);
-
-CREATE INDEX idx_deposit_members_deposit_id ON deposit_members (deposit_id);
-
-CREATE INDEX idx_withdraws_issuer ON withdraws (issuer);
-CREATE INDEX idx_withdraws_date ON withdraws (created_at);
+CREATE INDEX idx_sessions_issuer ON sessions (issuer);
+CREATE INDEX idx_sessions_date ON sessions (created_at);
+CREATE INDEX idx_session_members_session_id ON session_members (session_id);
