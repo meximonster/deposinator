@@ -2,14 +2,44 @@ package db
 
 import (
 	"github.com/deposinator/models"
+	"github.com/deposinator/utils"
 )
 
 func GetDeposits(query string, args ...interface{}) ([]models.Deposit, error) {
 	var deposits []models.Deposit
-	err := db.Select(&deposits, query, args...)
+	rows, err := db.Queryx(query, args...)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+
+	// Iterate over the rows
+	for rows.Next() {
+		var d models.Deposit
+		var membersStr string
+
+		// Scan the row into the struct and the temporary members string
+		err := rows.Scan(
+			&d.Id,
+			&d.Issuer,
+			&membersStr, // Scan into string
+			&d.Amount,
+			&d.Description,
+			&d.Created_at,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Parse the PostgreSQL array string into []int
+		d.Members, err = utils.ParseArray(membersStr)
+		if err != nil {
+			return nil, err
+		}
+
+		deposits = append(deposits, d)
+	}
+
 	return deposits, nil
 }
 

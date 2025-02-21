@@ -27,11 +27,23 @@ func GetDeposits(c *gin.Context) {
 	offset := c.DefaultQuery("offset", "0")
 
 	query := `
-		SELECT d.id, d.issuer, d.amount, d.description, d.created_at
-		FROM deposits d
-		LEFT JOIN deposit_members dm ON d.id = dm.deposit_id
-		WHERE 1=1
+		SELECT 
+			d.id, 
+			d.issuer, 
+			COALESCE(ARRAY_AGG(dm.user_id), '{}') AS members,
+			d.amount, 
+			d.description, 
+			d.created_at
+		FROM 
+			deposits d
+		LEFT JOIN 
+			deposit_members dm 
+		ON 
+			d.id = dm.deposit_id
+		GROUP BY 
+			d.id, d.issuer, d.amount, d.description, d.created_at
 	`
+
 	var args []interface{}
 	argIndex := 1
 
