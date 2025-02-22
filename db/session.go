@@ -78,7 +78,7 @@ func SessionUpdate(id int, issuer int, members []int, amount int, withdraw_amoun
 		tx.Rollback()
 		return err
 	}
-	_, err = db.Exec("DELETE FROM session_members where session_id = $1", id)
+	_, err = tx.Exec("DELETE FROM session_members where session_id = $1", id)
 	if err != nil {
 		tx.Rollback()
 		return err
