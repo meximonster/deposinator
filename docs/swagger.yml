@@ -248,7 +248,7 @@ definitions:
       result:
         type: array
         items:
-          $ref: '#/definitions/Session'
+          $ref: '#/definitions/SerializerResponse'
 
   Session:
     type: object
@@ -299,4 +299,31 @@ definitions:
       withdraw_amount:
         type: integer
       description:
+        type: string
+
+  SerializerResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      issuer_id:
+        type: integer
+      issuer_username:
+        type: string
+      members:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+      amount:
+        type: integer
+      withdraw_amount:
+        type: integer
+      description:
+        type: string
+      created_at:
         type: string
