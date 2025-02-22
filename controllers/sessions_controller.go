@@ -27,23 +27,24 @@ func GetSessions(c *gin.Context) {
 	offset := c.DefaultQuery("offset", "0")
 
 	query := `
-		SELECT DISTINCT
-			s.id, 
-			s.issuer as issuer_id,
-			u.username as issuer_username, 
-			COALESCE(
-				JSON_AGG(
-					JSON_BUILD_OBJECT('id', sm.user_id, 'username', u.username)
-				) FILTER (WHERE sm.user_id IS NOT NULL), '[]'
-			) AS members,
-			s.amount,
-			s.withdraw_amount, 
-			s.description, 
-			s.created_at
+		SELECT
+		s.id,
+		s.issuer AS issuer_id,
+		issuer_user.username AS issuer_username,
+		COALESCE(
+			JSON_AGG(
+				JSON_BUILD_OBJECT('id', sm.user_id, 'username', member_user.username)
+			) FILTER (WHERE sm.user_id IS NOT NULL), '[]'
+		) AS members,
+		s.amount,
+		s.withdraw_amount,
+		s.description,
+		s.created_at
 		FROM sessions s
+		LEFT JOIN users issuer_user ON s.issuer = issuer_user.id 
 		LEFT JOIN session_members sm ON s.id = sm.session_id
-		LEFT JOIN users u ON sm.user_id = u.id
-		GROUP BY s.id, s.issuer, u.username, s.amount, s.description, s.created_at
+		LEFT JOIN users member_user ON sm.user_id = member_user.id 
+		GROUP BY s.id, s.issuer, issuer_user.username, s.amount, s.withdraw_amount, s.description, s.created_at
 	`
 
 	var args []interface{}
