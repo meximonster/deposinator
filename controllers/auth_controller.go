@@ -9,6 +9,7 @@ import (
 	"github.com/deposinator/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(c *gin.Context) {
@@ -40,12 +41,18 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	user.Id, err = db.UserCreate(user.Username, user.Email, user.Password)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
+	}
+
+	user.Id, err = db.UserCreate(user.Username, user.Email, string(hashedPassword))
 	if err != nil {
 		log.Printf("error creating user %s: %s", user.Username, err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
+	user.Password = string(hashedPassword)
 
 	session := sessions.Default(c)
 	session.Set("userID", user.Id)
