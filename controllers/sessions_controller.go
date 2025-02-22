@@ -29,20 +29,21 @@ func GetSessions(c *gin.Context) {
 	query := `
 		SELECT 
 			s.id, 
-			s.issuer, 
-			COALESCE(ARRAY_AGG(sm.user_id), '{}') AS members,
+			s.issuer as issuer_id,
+			u.username as issuer_username, 
+			COALESCE(
+				JSON_AGG(
+					JSON_BUILD_OBJECT('id', sm.user_id, 'username', u.username)
+				) FILTER (WHERE sm.user_id IS NOT NULL), '[]'
+			) AS members,
 			s.amount,
-			s.withdraw_amount,
+			s.withdraw_amount, 
 			s.description, 
 			s.created_at
-		FROM 
-			sessions s
-		LEFT JOIN 
-			session_members sm 
-		ON 
-			s.id = sm.session_id
-		GROUP BY 
-			s.id, s.issuer, s.amount, s.description, s.created_at
+		FROM sessions s
+		LEFT JOIN session_members sm ON s.id = sm.session_id
+		LEFT JOIN users u ON sm.user_id = u.id
+		GROUP BY s.id, s.issuer, u.username, s.amount, s.description, s.created_at
 	`
 
 	var args []interface{}
@@ -103,7 +104,13 @@ func SessionCreate(c *gin.Context) {
 		return
 	}
 
-	err := db.SessionCreate(session.Issuer, session.Members, session.Amount, session.WithdrawAmount, session.Description)
+	err := session.Validate()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
+
+	err = db.SessionCreate(session.Issuer, session.Members, session.Amount, session.WithdrawAmount, session.Description)
 	if err != nil {
 		log.Println("error creating session: ", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))

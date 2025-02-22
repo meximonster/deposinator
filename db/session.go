@@ -2,13 +2,13 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 
-	"github.com/deposinator/models"
-	"github.com/deposinator/utils"
+	"github.com/deposinator/serializers"
 )
 
-func GetSessions(query string, args ...interface{}) ([]models.Session, error) {
-	var sessions []models.Session
+func GetSessions(query string, args ...interface{}) ([]serializers.SessionSerializer, error) {
+	var sessions []serializers.SessionSerializer
 	rows, err := db.Queryx(query, args...)
 	if err != nil {
 		return nil, err
@@ -17,13 +17,14 @@ func GetSessions(query string, args ...interface{}) ([]models.Session, error) {
 
 	// Iterate over the rows
 	for rows.Next() {
-		var s models.Session
+		var s serializers.SessionSerializer
 		var membersStr string
 
 		// Scan the row into the struct and the temporary members string
 		err := rows.Scan(
 			&s.Id,
-			&s.Issuer,
+			&s.IssuerID,
+			&s.IssuerUsername,
 			&membersStr, // Scan into string
 			&s.Amount,
 			&s.WithdrawAmount,
@@ -34,12 +35,13 @@ func GetSessions(query string, args ...interface{}) ([]models.Session, error) {
 			return nil, err
 		}
 
-		// Parse the PostgreSQL array string into []int
-		s.Members, err = utils.ParseArray(membersStr)
+		var members []serializers.Member
+		err = json.Unmarshal([]byte(membersStr), &members)
 		if err != nil {
 			return nil, err
 		}
 
+		s.Members = members
 		sessions = append(sessions, s)
 	}
 

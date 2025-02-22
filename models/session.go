@@ -16,6 +16,9 @@ type Session struct {
 }
 
 func (s *Session) Validate() error {
+	if len(s.Members) == 0 || s.Members == nil {
+		return errors.New("invalid members length")
+	}
 	if len(s.Description) > 100 {
 		return errors.New("invalid description length")
 	}
