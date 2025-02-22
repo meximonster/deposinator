@@ -26,37 +26,34 @@ func GetSessions(c *gin.Context) {
 	limit := c.DefaultQuery("limit", "10")
 	offset := c.DefaultQuery("offset", "0")
 
+	// Base query
 	query := `
-		SELECT
-		s.id,
-		s.issuer AS issuer_id,
-		issuer_user.username AS issuer_username,
-		COALESCE(
-			JSON_AGG(
-				JSON_BUILD_OBJECT('id', sm.user_id, 'username', member_user.username)
-			) FILTER (WHERE sm.user_id IS NOT NULL), '[]'
-		) AS members,
-		s.amount,
-		s.withdraw_amount,
-		s.description,
-		s.created_at
-		FROM sessions s
-		LEFT JOIN users issuer_user ON s.issuer = issuer_user.id 
-		LEFT JOIN session_members sm ON s.id = sm.session_id
-		LEFT JOIN users member_user ON sm.user_id = member_user.id
-	`
+    SELECT
+        s.id,
+        s.issuer AS issuer_id,
+        issuer_user.username AS issuer_username,
+        COALESCE(
+            JSON_AGG(
+                JSON_BUILD_OBJECT('id', sm.user_id, 'username', member_user.username)
+            ) FILTER (WHERE sm.user_id IS NOT NULL), '[]'
+        ) AS members,
+        s.amount,
+        s.withdraw_amount,
+        s.description,
+        s.created_at
+    FROM sessions s
+    LEFT JOIN users issuer_user ON s.issuer = issuer_user.id
+    LEFT JOIN session_members sm ON s.id = sm.session_id
+    LEFT JOIN users member_user ON sm.user_id = member_user.id
+`
 
 	var args []interface{}
 	argIndex := 1
 
+	// Add filters
 	if issuer != "" {
 		query += fmt.Sprintf(" AND s.issuer = $%d", argIndex)
 		args = append(args, issuer)
-		argIndex++
-	}
-	if member != "" {
-		query += fmt.Sprintf(" AND sm.user_id = $%d", argIndex)
-		args = append(args, member)
 		argIndex++
 	}
 	if minAmount != "" {
@@ -85,13 +82,25 @@ func GetSessions(c *gin.Context) {
 		argIndex++
 	}
 
-	query += "GROUP BY s.id, s.issuer, issuer_user.username, s.amount, s.withdraw_amount, s.description, s.created_at "
-	query += fmt.Sprintf("ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, argIndex, argIndex+1)
-	args = append(args, limit, offset)
+	// Group by and order by
+	query += " GROUP BY s.id, s.issuer, issuer_user.username, s.amount, s.withdraw_amount, s.description, s.created_at "
+	query += fmt.Sprintf(" ORDER BY %s %s", sortBy, sortOrder)
 
-	sessions, err := db.GetSessions(query, args...)
+	// Add limit and offset
+	query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
+	args = append(args, limit, offset)
+	argIndex += 2
+
+	// Add member filter if applicable
+	finalQuery := query
+	if member != "" {
+		finalQuery = fmt.Sprintf("SELECT * FROM (%s) foo WHERE EXISTS (SELECT 1 FROM jsonb_array_elements(members::jsonb) AS member WHERE member->>'id' = $%d)", query, argIndex)
+		args = append(args, member)
+	}
+
+	sessions, err := db.GetSessions(finalQuery, args...)
 	if err != nil {
-		log.Printf("error getting sessions. query: %s, error %s\n", query, err.Error())
+		log.Printf("error getting sessions. query: %s, error %s\n", finalQuery, err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
