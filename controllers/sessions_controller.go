@@ -27,7 +27,7 @@ func GetSessions(c *gin.Context) {
 	offset := c.DefaultQuery("offset", "0")
 
 	query := `
-		SELECT 
+		SELECT DISTINCT
 			s.id, 
 			s.issuer as issuer_id,
 			u.username as issuer_username, 

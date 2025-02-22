@@ -40,7 +40,9 @@ func GetSessions(query string, args ...interface{}) ([]serializers.SessionSerial
 		if err != nil {
 			return nil, err
 		}
-
+		if members == nil {
+			members = []serializers.Member{}
+		}
 		s.Members = members
 		sessions = append(sessions, s)
 	}
