@@ -97,6 +97,7 @@ func GetSessions(c *gin.Context) {
 		finalQuery = fmt.Sprintf("SELECT * FROM (%s) foo WHERE EXISTS (SELECT 1 FROM jsonb_array_elements(members::jsonb) AS member WHERE member->>'id' = $%d)", query, argIndex)
 		args = append(args, member)
 	}
+	log.Println(finalQuery)
 
 	sessions, err := db.GetSessions(finalQuery, args...)
 	if err != nil {
