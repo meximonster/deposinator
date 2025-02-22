@@ -45,6 +45,7 @@ func GetSessions(c *gin.Context) {
     LEFT JOIN users issuer_user ON s.issuer = issuer_user.id
     LEFT JOIN session_members sm ON s.id = sm.session_id
     LEFT JOIN users member_user ON sm.user_id = member_user.id
+	WHERE 1=1
 `
 
 	var args []interface{}
