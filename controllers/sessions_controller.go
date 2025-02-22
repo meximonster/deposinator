@@ -43,8 +43,7 @@ func GetSessions(c *gin.Context) {
 		FROM sessions s
 		LEFT JOIN users issuer_user ON s.issuer = issuer_user.id 
 		LEFT JOIN session_members sm ON s.id = sm.session_id
-		LEFT JOIN users member_user ON sm.user_id = member_user.id 
-		GROUP BY s.id, s.issuer, issuer_user.username, s.amount, s.withdraw_amount, s.description, s.created_at
+		LEFT JOIN users member_user ON sm.user_id = member_user.id
 	`
 
 	var args []interface{}
@@ -86,7 +85,8 @@ func GetSessions(c *gin.Context) {
 		argIndex++
 	}
 
-	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, argIndex, argIndex+1)
+	query += "GROUP BY s.id, s.issuer, issuer_user.username, s.amount, s.withdraw_amount, s.description, s.created_at "
+	query += fmt.Sprintf("ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, argIndex, argIndex+1)
 	args = append(args, limit, offset)
 
 	sessions, err := db.GetSessions(query, args...)
