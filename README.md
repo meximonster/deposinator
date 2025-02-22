@@ -8,8 +8,15 @@ Create a .env file using .env.example in project root
 make dev
 ```
 
-## Populate the db
+## Clean postgres data
 
 ```bash
-make data
+make clean
+```
+
+## Open psql session
+
+```bash
+su - postgres
+psql
 ```
