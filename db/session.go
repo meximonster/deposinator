@@ -8,7 +8,7 @@ import (
 )
 
 func GetSessions(query string, args ...interface{}) ([]serializers.SessionSerializer, error) {
-	var sessions []serializers.SessionSerializer
+	sessions := []serializers.SessionSerializer{}
 	rows, err := db.Queryx(query, args...)
 	if err != nil {
 		return nil, err

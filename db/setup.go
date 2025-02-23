@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -10,7 +11,7 @@ import (
 
 var db *sqlx.DB
 
-func NewDB(host string, user string, password string) error {
+func NewDB(host string, user string, password string) (*sql.DB, error) {
 	maxRetries := 10
 	retryDelay := 5 * time.Second
 
@@ -24,7 +25,7 @@ func NewDB(host string, user string, password string) error {
 			database.SetConnMaxLifetime(5 * time.Minute)
 
 			db = database
-			return nil
+			return database.DB, nil
 		}
 
 		// Log the error and retry
@@ -34,5 +35,5 @@ func NewDB(host string, user string, password string) error {
 	}
 
 	// If all retries fail, return the last error
-	return fmt.Errorf("failed to connect to database after %d retries: %w", maxRetries, err)
+	return nil, fmt.Errorf("failed to connect to database after %d retries: %w", maxRetries, err)
 }

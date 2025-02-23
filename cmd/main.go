@@ -15,10 +15,12 @@ func main() {
 		log.Fatal("error loading configuration: ", err.Error())
 	}
 
-	err = db.NewDB(c.POSTGRES_HOST, c.POSTGRES_USER, c.POSTGRES_PASS)
+	sqlDB, err := db.NewDB(c.POSTGRES_HOST, c.POSTGRES_USER, c.POSTGRES_PASS)
 	if err != nil {
 		log.Fatal("error connecting to db: ", err)
 	}
 
-	server.Run(c.ENVIRONMENT, c.HTTP_PORT, c.STORE_KEY)
+	if err := server.Run(sqlDB, c.ENVIRONMENT, c.HTTP_PORT, c.STORE_KEY); err != nil {
+		log.Fatal("http server returned error: ", err)
+	}
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"net/http"
 	"time"
 
@@ -8,15 +9,18 @@ import (
 	"github.com/deposinator/middlewares"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/memstore"
+	"github.com/gin-contrib/sessions/postgres"
 	"github.com/gin-gonic/gin"
 )
 
-func Run(env string, port string, storeKey string) {
+func Run(db *sql.DB, env string, port string, storeKey string) error {
 
 	r := gin.Default()
 
-	store := memstore.NewStore([]byte(storeKey))
+	store, err := postgres.NewStore(db, []byte(storeKey))
+	if err != nil {
+		return err
+	}
 	store.Options(sessions.Options{
 		Path:     "/",
 		MaxAge:   21600,
@@ -58,5 +62,5 @@ func Run(env string, port string, storeKey string) {
 	r.Static("/swagger-ui", "./swagger-ui")
 	r.StaticFile("/docs/swagger.yml", "./docs/swagger.yml")
 
-	r.Run(":5000")
+	return r.Run(":5000")
 }
