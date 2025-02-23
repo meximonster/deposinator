@@ -1,6 +1,6 @@
 # DEPOSINATOR
 
-Create a .env file using .env.example in project root
+Create a .env file in project root using docs/example.env
 
 ## Run locally
 
@@ -14,9 +14,13 @@ make dev
 make clean
 ```
 
-## Open psql session
+### Open psql session
 
 ```bash
+# switch to postgres user
 su - postgres
+# connect to db
 psql
+# show tables
+\dt+
 ```
