@@ -20,6 +20,12 @@ STORE_KEY: secret
 make dev
 ```
 
+## Populate the db
+
+```bash
+make data
+```
+
 ## Clean postgres data
 
 ```bash
