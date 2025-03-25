@@ -54,6 +54,7 @@ func Run(db *sql.DB, env string, port string, storeKey string) error {
 	sessions := r.Group("/sessions")
 	{
 		sessions.GET("", middlewares.AuthMiddleware(), controllers.GetSessions)
+		sessions.GET("/:id", middlewares.AuthMiddleware(), controllers.SessionById)
 		sessions.POST("", middlewares.AuthMiddleware(), controllers.SessionCreate)
 		sessions.PUT("", middlewares.AuthMiddleware(), controllers.SessionUpdate)
 		sessions.DELETE("/:id", middlewares.AuthMiddleware(), controllers.SessionDelete)

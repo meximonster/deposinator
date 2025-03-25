@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 
+	"github.com/deposinator/models"
 	"github.com/deposinator/serializers"
 )
 
@@ -90,6 +91,15 @@ func SessionUpdate(id int, issuer int, members []int, amount int, withdraw_amoun
 		return err
 	}
 	return tx.Commit()
+}
+
+func SessionFromId(id int) *models.Session {
+	var session models.Session
+	err := db.Get(&session, "SELECT * FROM sessions WHERE id = $1", id)
+	if err != nil {
+		return &models.Session{}
+	}
+	return &session
 }
 
 func SessionDelete(id int) error {

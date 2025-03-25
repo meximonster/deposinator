@@ -159,6 +159,10 @@ func SessionDelete(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
+	session := db.SessionFromId(session_id)
+	if session.Id == 0 || session == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "session does not exist"))
+	}
 	err = db.SessionDelete(session_id)
 	if err != nil {
 		log.Println("error deleting session: ", err)
@@ -166,4 +170,24 @@ func SessionDelete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, utils.GenerateJSONResponse("success", "OK"))
+}
+
+func SessionById(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		log.Println("id parameter not found")
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "missing id parameter"))
+		return
+	}
+	session_id, err := strconv.Atoi(id)
+	if err != nil {
+		log.Println("invalid session id: ", id)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
+	session := db.SessionFromId(session_id)
+	if session.Id == 0 || session == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "session does not exist"))
+	}
+	c.JSON(http.StatusOK, utils.GenerateJSONResultResponse("success", "OK", session))
 }
