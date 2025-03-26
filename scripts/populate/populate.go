@@ -7,6 +7,7 @@ import (
 	"github.com/deposinator/models"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type SessionMember struct {
@@ -38,7 +39,11 @@ func main() {
 	userIDs := make([]int, len(users))
 	for i, user := range users {
 		var id int
-		err := tx.QueryRowx(`INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id`, user.Username, user.Password, user.Email).Scan(&id)
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			panic(err)
+		}
+		err = tx.QueryRowx(`INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id`, user.Username, string(hashedPassword), user.Email).Scan(&id)
 		if err != nil {
 			tx.Rollback()
 			log.Fatalln(err)

@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 
 	"github.com/deposinator/models"
 	"github.com/deposinator/serializers"
@@ -93,13 +94,16 @@ func SessionUpdate(id int, issuer int, members []int, amount int, withdraw_amoun
 	return tx.Commit()
 }
 
-func SessionFromId(id int) *models.Session {
+func SessionFromId(id int) (*models.Session, error) {
 	var session models.Session
 	err := db.Get(&session, "SELECT * FROM sessions WHERE id = $1", id)
-	if err != nil {
-		return &models.Session{}
+	if err == sql.ErrNoRows {
+		return nil, errors.New("session does not exist")
 	}
-	return &session
+	if err != nil {
+		return nil, err
+	}
+	return &session, nil
 }
 
 func SessionDelete(id int) error {

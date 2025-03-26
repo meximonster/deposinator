@@ -159,9 +159,13 @@ func SessionDelete(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
-	session := db.SessionFromId(session_id)
-	if session.Id == 0 || session == nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "session does not exist"))
+	_, err = db.SessionFromId(session_id)
+	if err != nil && err.Error() == "session does not exist" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 	}
 	err = db.SessionDelete(session_id)
 	if err != nil {
@@ -185,9 +189,13 @@ func SessionById(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
-	session := db.SessionFromId(session_id)
-	if session.Id == 0 || session == nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "session does not exist"))
+	session, err := db.SessionFromId(session_id)
+	if err != nil && err.Error() == "session does not exist" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
 	}
 	c.JSON(http.StatusOK, utils.GenerateJSONResultResponse("success", "OK", session))
 }
