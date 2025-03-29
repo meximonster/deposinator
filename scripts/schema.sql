@@ -26,4 +26,6 @@ CREATE TABLE session_members
 
 CREATE INDEX idx_sessions_issuer ON sessions (issuer);
 CREATE INDEX idx_sessions_date ON sessions (created_at);
+CREATE INDEX idx_sessions_created_at ON sessions(created_at);
 CREATE INDEX idx_session_members_session_id ON session_members (session_id);
+CREATE INDEX idx_session_members_user_id ON session_members(user_id);

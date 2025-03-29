@@ -23,6 +23,29 @@ paths:
             type: array
             items:
               $ref: '#/definitions/UsersResponse'
+  /users/{user_id}/dashboard:
+    get:
+      summary: Get user dashboard data
+      description: Retrieve aggregated dashboard statistics for a specific user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+          description: The ID of the user to get dashboard data for
+      responses:
+        '200':
+          description: User dashboard data
+          schema:
+            $ref: '#/definitions/DashboardResponse'
+        '400':
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/JSONResponse'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/JSONResponse'
   /auth/register:
     post:
       summary: Sign up a new user
@@ -353,3 +376,114 @@ definitions:
         type: string
       created_at:
         type: string
+
+  DashboardResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      description:
+        type: string
+        example: "OK"
+      result:
+        $ref: '#/definitions/DashboardData'
+
+  DashboardData:
+    type: object
+    properties:
+      totals:
+        $ref: '#/definitions/DashboardTotals'
+      weekly:
+        type: array
+        items:
+          $ref: '#/definitions/WeeklyResult'
+      sessions:
+        type: array
+        items:
+          $ref: '#/definitions/SessionResult'
+      monthly:
+        type: array
+        items:
+          $ref: '#/definitions/MonthlyResult'
+
+  DashboardTotals:
+    type: object
+    properties:
+      total_deposits:
+        type: number
+        format: float
+        example: 1500.50
+      total_withdrawals:
+        type: number
+        format: float
+        example: 2000.75
+      net_result:
+        type: number
+        format: float
+        example: 500.25
+      last_30days_net_result:
+        type: number
+        format: float
+        example: 250.50
+
+  WeeklyResult:
+    type: object
+    properties:
+      week_start:
+        type: string
+        format: date
+        example: "2023-05-01"
+      week_end:
+        type: string
+        format: date
+        example: "2023-05-07"
+      net_result:
+        type: number
+        format: float
+        example: 75.25
+
+  SessionResult:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 123
+      date:
+        type: string
+        format: date-time
+        example: "2023-05-05T14:30:00Z"
+      deposit_amount:
+        type: number
+        format: float
+        example: 100.00
+      withdraw_amount:
+        type: number
+        format: float
+        example: 150.00
+      net_result:
+        type: number
+        format: float
+        example: 50.00
+      description:
+        type: string
+        example: "Weekly trading session"
+
+  MonthlyResult:
+    type: object
+    properties:
+      month:
+        type: string
+        example: "May 2023"
+      deposits:
+        type: number
+        format: float
+        example: 1000.00
+      withdrawals:
+        type: number
+        format: float
+        example: 1500.00
+      net_result:
+        type: number
+        format: float
+        example: 500.00

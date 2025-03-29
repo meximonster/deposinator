@@ -13,7 +13,7 @@ services:
           - '9944:9944'
         volumes: 
           - ./postgres-data:/var/lib/postgresql/data
-          - ../scripts/init_db/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+          - ../scripts/schema.sql:/docker-entrypoint-initdb.d/tables.sql
         healthcheck:
           test: ["CMD-SHELL", "pg_isready -U postgres"]
           interval: 5s

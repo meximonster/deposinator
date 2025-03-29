@@ -49,6 +49,7 @@ func Run(db *sql.DB, env string, port string, storeKey string) error {
 	users := r.Group("/users")
 	{
 		users.GET("", middlewares.AuthMiddleware(), controllers.GetUsers)
+		users.GET("/:id/dashboard", middlewares.AuthMiddleware(), controllers.GetUserDashboard)
 	}
 
 	sessions := r.Group("/sessions")
