@@ -131,13 +131,25 @@ func SessionCreate(c *gin.Context) {
 }
 
 func SessionUpdate(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		log.Println("id parameter not found")
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", "missing id parameter"))
+		return
+	}
+	session_id, err := strconv.Atoi(id)
+	if err != nil {
+		log.Println("invalid session id: ", id)
+		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
+		return
+	}
 	var session *models.Session
 	if err := c.BindJSON(&session); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, utils.GenerateJSONResponse("error", err.Error()))
 		return
 	}
 
-	err := db.SessionUpdate(session.Id, session.Issuer, session.Members, session.Amount, session.WithdrawAmount, session.Description)
+	err = db.SessionUpdate(session_id, session.Issuer, session.Members, session.Amount, session.WithdrawAmount, session.Description)
 	if err != nil {
 		log.Println("error updating session: ", err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.GenerateJSONResponse("error", err.Error()))
